@@ -18,14 +18,17 @@ end)
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(1)
-
-        for key, value in pairs(Config.Locations) do
-           if IsPlayerNearCoords(value.x, value.y, value.z) then
-                if not menu then
-                    DrawText("Press G to view your telegrams.", 0.5, 0.88)
-                    if IsControlJustReleased(0, 0x760A9C6F) then
-                        menu = true
+    local InRange = false
+    local PlayerPed = PlayerPedId()
+    local PlayerPos = GetEntityCoords(PlayerPed)
+        for key, loc in pairs(Config.Locations) do
+            local dist = #(PlayerPos - vector3(loc["x"], loc["y"], loc["z"]))
+            if dist < 2 then
+                InRange = true
+                Citizen.InvokeNative(0x2A32FAA57B937173, -1795314153, 2, loc["x"], loc["y"] + 0.5, loc["z"] - 1, 0, 0, 0, 0, 0, 0, 1.3, 1.3, 2.0, 93, 0, 0, 155, 0, 0, 2, 0, 0, 0, 0)            --end
+                if dist < 1 then
+                        DrawText3Ds(loc["x"], loc["y"], loc["z"] + 0.15, '~g~E~w~ - Press E to view your telegrams')
+                    if IsControlJustPressed(0, 0xCEFD9220) then -- E
                         TriggerServerEvent("qbr-telegram:server::GetMessages")
                     end
                 end
@@ -33,24 +36,6 @@ Citizen.CreateThread(function()
         end
     end
 end)
-
-function IsPlayerNearCoords(x, y, z)
-    local playerx, playery, playerz = table.unpack(GetEntityCoords(GetPlayerPed(), 0))
-    local distance = GetDistanceBetweenCoords(playerx, playery, playerz, x, y, z, true)
-
-    if distance < 2 then
-        return true
-    end
-end
-
-function DrawText(text,x,y)
-    SetTextScale(0.35,0.35)
-    SetTextColor(255,255,255,255)--r,g,b,a
-    SetTextCentre(true)--true,false
-    SetTextDropshadow(1,0,0,0,200)--distance,r,g,b,a
-    SetTextFontForCurrentCommand(0)
-    DisplayText(CreateVarString(10, "LITERAL_STRING", text), x, y)
-end
 
 function CloseTelegram()
     index = 1
