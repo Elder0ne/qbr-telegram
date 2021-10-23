@@ -32,6 +32,10 @@ Citizen.CreateThread(function()
                         TriggerServerEvent("qbr-telegram:server::GetMessages")
                     end
                 end
+            if not inRange then
+                Citizen.Wait(1000)
+            end
+                Citizen.Wait(3)            
             end
         end
     end

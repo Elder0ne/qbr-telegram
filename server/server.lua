@@ -1,4 +1,5 @@
-local requirejob = Config.requirejob
+
+local requirejob = false
 local QBCore = exports['qbr-core']:GetCoreObject()
 
 RegisterServerEvent("qbr-telegram:server:GetTelegrams")

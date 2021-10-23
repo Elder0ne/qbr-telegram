@@ -1,2 +1,2 @@
 # qbr-telegram
-Telegrams for RedM QBCore 
+Telegrams for RedM QBCore
