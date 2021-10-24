@@ -21,7 +21,7 @@ Citizen.CreateThread(function()
     local InRange = false
     local PlayerPed = PlayerPedId()
     local PlayerPos = GetEntityCoords(PlayerPed)
-        for key, loc in pairs(Config.Locations) do
+        for key, loc in pairs(Config.POBoxes) do
             local dist = #(PlayerPos - vector3(loc["x"], loc["y"], loc["z"]))
             if dist < 2 then
                 InRange = true
