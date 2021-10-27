@@ -30,7 +30,7 @@ Citizen.CreateThread(function()
                     if dist < 1 then
                                DrawText3Ds(loc["x"], loc["y"], loc["z"] + 0.15, '~g~E~w~ - Press E to view your telegrams')
                         if IsControlJustPressed(0, 0xCEFD9220) then -- E
-                            TriggerServerEvent("qbr-telegram:server::GetMessages")
+                            TriggerServerEvent("qbr-telegram:server:GetTelegrams")
                         end
 
                     end 
@@ -87,7 +87,7 @@ RegisterNUICallback('new', function()
 end)
 
 RegisterNUICallback('delete', function()
-    TriggerServerEvent("qbr-telegram:server::DeleteMessage", telegrams[index].id)
+    TriggerServerEvent("qbr-telegram:server:DeleteMessage", telegrams[index].id)
 end)
 
 function GetFirstname()
@@ -160,7 +160,7 @@ function GetMessage(firstname, lastname)
 
             print(firstname, lastname, message)
             
-            TriggerServerEvent("qbr-telegram:server::SendMessage", firstname, lastname, message, GetPlayerServerIds())
+            TriggerServerEvent("qbr-telegram:server:SendMessage", firstname, lastname, message, GetPlayerServerIds())
            
             break
         end

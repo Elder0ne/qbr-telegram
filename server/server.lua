@@ -3,28 +3,25 @@ local requirejob = Config.requirejob
 local QBCore = exports['qbr-core']:GetCoreObject()
 
 RegisterServerEvent("qbr-telegram:server:GetTelegrams")
-AddEventHandler("qbr-telegram:server::GetTelegrams", function(source)
-	local src = source
+AddEventHandler("qbr-telegram:server:GetTelegrams", function(source)
 	if requirejob then 
 		-- Reserved for Pony Express Job
-	else 
-		local Player =  QBCore.Functions.GetPlayer(src)
-		local recipient = Player
-		local recipientid = Player.PlayerData.citizenid
+	else
+		local recipient = QBCore.Functions.GetPlayer(source)
+		local recipientid = recipient.PlayerData.citizenid
 			exports.oxmysql:fetch("SELECT * FROM telegrams WHERE recipient=@recipient AND recipientid=@recipientid ORDER BY id DESC", { ['@recipient'] = recipient, ['@recipientid'] = recipientid }, function(result)
-			TriggerClientEvent("qbr-telegram:client:ReturnMessages", src, result)
+			TriggerClientEvent("qbr-telegram:client:ReturnMessages", source, result)
 			end)
 	end
 end)
 
-RegisterServerEvent("qbr-telegram:server::SendMessage")
-AddEventHandler("qbr-telegram:server::SendMessage", function(firstname, lastname, message, players)
-	local src = source
+RegisterServerEvent("qbr-telegram:server:SendMessage")
+AddEventHandler("qbr-telegram:server:SendMessage", function(source, firstname, lastname, message, players)
 	if requirejob then 
 		-- Reserved for Pony Express Job
 	else
-		local Player =  QBCore.Functions.GetPlayer(src)
-		local sender = GetPlayerName(src)
+		local Player =  QBCore.Functions.GetPlayer(source)
+		local sender = GetPlayerName(source)
 		exports.oxmysql:fetch("SELECT identifier, characterid FROM characters WHERE firstname=@firstname AND lastname=@lastname", { ['@firstname'] = firstname, ['@lastname'] = lastname}, function(result)
 			if result[1] then 
 				local recipient = result[1].identifier 
@@ -40,19 +37,19 @@ AddEventHandler("qbr-telegram:server::SendMessage", function(firstname, lastname
 									end
 							end
 						else 
-							TriggerClientEvent('QBCore:Notify', src, 'We are unable to process your Telegram right now. Please try again later.', 'error')
+							TriggerClientEvent('QBCore:Notify', source, 'We are unable to process your Telegram right now. Please try again later.', 'error')
 						end
 					end)
-				TriggerClientEvent('QBCore:Notify', src, 'Your telegram has been posted.', 'success')
+				TriggerClientEvent('QBCore:Notify', source, 'Your telegram has been posted.', 'success')
 			else 
-				TriggerClientEvent('QBCore:Notify', src, 'Unable to process Telegram. Invalid first or lastname.', 'error')
+				TriggerClientEvent('QBCore:Notify', source, 'Unable to process Telegram. Invalid first or lastname.', 'error')
 			end
 		end)
 	end
 end)
 
-RegisterServerEvent("qbr-telegram:server::DeleteMessage")
-AddEventHandler("qbr-telegram:server::DeleteMessage", function(id)
+RegisterServerEvent("qbr-telegram:server:DeleteMessage")
+AddEventHandler("qbr-telegram:server:DeleteMessage", function(id)
 	local src = source
 	exports.oxmysql:execute('DELETE FROM telegrams WHERE id = ?', {id})
 		if count > 0 then 
