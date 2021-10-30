@@ -1,6 +1,7 @@
 local QBCore = exports['qbr-core']:GetCoreObject()
 local requirejob = Config.requirejob
 
+
 RegisterServerEvent("qbr-telegram:server:GetTelegrams")
 AddEventHandler("qbr-telegram:server:GetTelegrams", function()
 	if requirejob then 
@@ -16,6 +17,25 @@ AddEventHandler("qbr-telegram:server:GetTelegrams", function()
 	end
 end)
 
+QBCore.Functions.CreateCallback('qbr-banking:getBankingInformation', function(source, cb)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+	local recipient = Player.PlayerData.cid
+	local recipientid = Player.PlayerData.citizenid
+    while Player == nil do Wait(0) end
+        if (Player) then
+			
+			exports.oxmysql:fetch("SELECT * FROM telegrams WHERE recipient=@recipient AND recipientid=@recipientid ORDER BY id DESC", { ['@recipient'] = recipient, ['@recipientid'] = recipientid }, function(result)
+			cb(results)
+        else
+            cb(nil)
+        end
+end)
+
+
+
+
+
 RegisterServerEvent("qbr-telegram:server:SendMessage")
 AddEventHandler("qbr-telegram:server:SendMessage", function(firstname, lastname, message, players)
 	if requirejob then 
@@ -23,7 +43,6 @@ AddEventHandler("qbr-telegram:server:SendMessage", function(firstname, lastname,
 	else
 		local src = source
 		local Player =  QBCore.Functions.GetPlayer(src)
-		local sender = GetPlayerName(source)
 		exports.oxmysql:fetch("SELECT identifier, characterid FROM characters WHERE firstname=@firstname AND lastname=@lastname", { ['@firstname'] = firstname, ['@lastname'] = lastname}, function(result)
 			if result[1] then 
 				local recipient = result[1].identifier 
