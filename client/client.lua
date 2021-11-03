@@ -16,45 +16,29 @@ AddEventHandler("qbr-telegram:client:ReturnMessages", function(data)
     end
 end)
 
-
-Citizen.CreateThread(function()
-    while true do
-        local InRange = false
-        local PlayerPed = PlayerPedId()
-        local PlayerPos = GetEntityCoords(PlayerPed)
-            for key, loc in pairs(Config.POBoxes) do
-                local dist = #(PlayerPos - vector3(loc["x"], loc["y"], loc["z"]))
-                if dist < 2 then
-                    InRange = true
-                    Citizen.InvokeNative(0x2A32FAA57B937173, -1795314153, 2, loc["x"], loc["y"] + 0.5, loc["z"] - 1, 0, 0, 0, 0, 0, 0, 1.3, 1.3, 2.0, 93, 0, 0, 155, 0, 0, 2, 0, 0, 0, 0)            --end
-                    if dist < 1 then
-                               DrawText3Ds(loc["x"], loc["y"], loc["z"] + 0.15, '~g~E~w~ - Press E to view your telegrams')
-                        if IsControlJustPressed(0, 0xCEFD9220) then -- E
-                            TriggerServerEvent("qbr-telegram:server:GetTelegrams")
-                        end
-
-                    end 
-                end 
-            end      
-        if not InRange then
-            Wait(5000)
-        end
-        Wait(5)
-    end
+RegisterNetEvent('qbr-telegram:viewtelegrams')
+AddEventHandler('qbr-telegram:viewtelegrams', function()
+    TriggerServerEvent("qbr-telegram:server:GetTelegrams")
+    print('triggered telegrams')
 end)
 
-function DrawText3Ds(x, y, z, text)
-    local onScreen,_x,_y=GetScreenCoordFromWorldCoord(x, y, z)
-    local px,py,pz=table.unpack(GetGameplayCamCoord())
-    
-    SetTextScale(0.35, 0.35)
-    SetTextFontForCurrentCommand(1)
-    SetTextColor(255, 255, 255, 215)
-    local str = CreateVarString(10, "LITERAL_STRING", text, Citizen.ResultAsLong())
-    SetTextCentre(1)
-    DisplayText(str,_x,_y)
-    local factor = (string.len(text)) / 150
-end
+Citizen.CreateThread(function()
+    for k,v in pairs(Config.Mailboxes) do
+        if Config.Mailboxes[k].location == "desk" then
+            exports['qbr-prompts']:createPrompt(v.name, v.coords, 0xF3830D8E, 'View your Telegrams', {
+                type = 'client',
+                event = 'qbr-telegram:viewtelegrams',
+                args = { false, true, false },
+            })
+        elseif Config.Mailboxes[k].location == "pobox" then
+            exports['qbr-prompts']:createPrompt(v.name, v.coords, 0xF3830D8E, 'View your Telegrams', {
+                type = 'client',
+                event = 'qbr-telegram:viewtelegrams',
+                args = { false, true, false },
+            })
+        end
+    end      
+end)
 
 function CloseTelegram()
     index = 1
