@@ -2,6 +2,10 @@ local telegrams = {}
 local index = 1
 local menu = false
 
+QBCore = exports['qbr-core']:GetCoreObject()
+AnimDict = "amb_work@world_human_paper_sell@male_a@idle_c"
+Anim = "idle_g"
+
 RegisterNetEvent("qbr-telegram:client:ReturnMessages")
 AddEventHandler("qbr-telegram:client:ReturnMessages", function(data)
     index = 1
@@ -18,8 +22,25 @@ end)
 
 RegisterNetEvent('qbr-telegram:viewtelegrams')
 AddEventHandler('qbr-telegram:viewtelegrams', function()
-    TriggerServerEvent("qbr-telegram:server:GetTelegrams")
-    print('triggered telegrams')
+    QBCore.Functions.Progressbar("telegram_check", "Checking for Telegrams..", 5000, false, true, {
+        disableMovement = false,
+        disableCarMovement = false,
+        disableMouse = false,
+        disableCombat = true,
+    }, {
+        animDict = AnimDict,
+        anim = Anim,
+        flags = 16,
+    }, {}, {}, function() -- Done
+        isHealingPerson = false
+        StopAnimTask(PlayerPedId(), AnimDict, "exit", 1.0)
+        QBCore.Functions.Notify("Telegrams found!")
+        TriggerServerEvent("qbr-telegram:server:GetTelegrams")
+    end, function() -- Cancel
+        isHealingPerson = false
+        StopAnimTask(PlayerPedId(), AnimDict, "exit", 1.0)
+        QBCore.Functions.Notify("Come back when you are not in a rush!", "error")
+    end)
 end)
 
 Citizen.CreateThread(function()
@@ -28,14 +49,22 @@ Citizen.CreateThread(function()
             exports['qbr-prompts']:createPrompt(v.name, v.coords, 0xF3830D8E, 'View your Telegrams', {
                 type = 'client',
                 event = 'qbr-telegram:viewtelegrams',
-                args = { false, true, false },
             })
+            if v.showblip == true then
+                local StoreBlip = N_0x554d9d53f696d002(1664425300, v.coords)
+                    SetBlipSprite(StoreBlip, 1861010125, 52)
+                    SetBlipScale(StoreBlip, 0.2)
+            end
         elseif Config.Mailboxes[k].location == "pobox" then
-            exports['qbr-prompts']:createPrompt(v.name, v.coords, 0xF3830D8E, 'View your Telegrams', {
+            exports['qbr-prompts']:createPrompt(v.name, v.coords, 0xF3830D8E, 'View persons Telegrams', {
                 type = 'client',
                 event = 'qbr-telegram:viewtelegrams',
-                args = { false, true, false },
             })
+            if v.showblip == true then
+                local StoreBlip = N_0x554d9d53f696d002(1664425300, v.coords)
+                    SetBlipSprite(StoreBlip, 1475382911, 52)
+                    SetBlipScale(StoreBlip, 0.2)
+            end
         end
     end      
 end)
